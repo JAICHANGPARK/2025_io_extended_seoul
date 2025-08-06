@@ -27,18 +27,27 @@ class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
   Agent? agent;
   TextEditingController textEditingController = TextEditingController();
-  final history = <ChatMessage>[ChatMessage.system(systemPrompt)];
-  bool isLoading = false;
-
-  // Tool management
-  final List<McpToolItem> availableTools = [];
-  final Map<String, McpClient> mcpClients = {};
 
   // Tab controller for right panel
   late TabController _tabController;
 
   // Scroll controller for auto-scroll
   final ScrollController _scrollController = ScrollController();
+  final history = <ChatMessage>[ChatMessage.system(systemPrompt)];
+
+  // Tool management
+  final List<McpToolItem> availableTools = [];
+  final Map<String, McpClient> mcpClients = {};
+
+  bool isLoading = false;
+
+  // Token usage tracking
+  int currentPromptTokens = 0;
+  int currentResponseTokens = 0;
+  int currentTotalTokens = 0;
+  int cumulativePromptTokens = 0;
+  int cumulativeResponseTokens = 0;
+  int cumulativeTotalTokens = 0;
 
   // Auto-scroll to bottom
   void _scrollToBottom() {
@@ -52,14 +61,6 @@ class _MyHomePageState extends State<MyHomePage>
       });
     }
   }
-
-  // Token usage tracking
-  int currentPromptTokens = 0;
-  int currentResponseTokens = 0;
-  int currentTotalTokens = 0;
-  int cumulativePromptTokens = 0;
-  int cumulativeResponseTokens = 0;
-  int cumulativeTotalTokens = 0;
 
   @override
   void initState() {
