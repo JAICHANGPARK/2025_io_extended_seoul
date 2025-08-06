@@ -61,22 +61,38 @@ class _MyHomePageState extends State<MyHomePage>
   int cumulativeResponseTokens = 0;
   int cumulativeTotalTokens = 0;
 
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize tab controller for right panel
+    _tabController = TabController(length: 2, vsync: this);
+
+    // Initialize agent and tools
+    initSetup().then((_) async {
+      final tools = await initTools();
+      agent = await initAgent(tools);
+      setState(() {}); // Refresh UI after tools are loaded
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _scrollController.dispose();
+    textEditingController.dispose();
+    super.dispose();
+  }
+
   Future initSetup() async {
     // Enable default logging
+    /// TODO: [STEP01] Agents
     Agent.loggingOptions = const LoggingOptions();
-
     Agent.environment['GEMINI_API_KEY'] = geminiApiKey;
   }
 
-  Future initTools() async {
-    print('\nInitializing MCP Tools');
-
-    // Clear existing tools
-    setState(() {
-      availableTools.clear();
-      mcpClients.clear();
-    });
-
+  Future initDefaultTools() async {
+    /// TODO: [STEP01] 기본 툴 초기화
     // Initialize HuggingFace client
     final huggingFace = McpClient.remote(
       'huggingface',
@@ -110,37 +126,45 @@ class _MyHomePageState extends State<MyHomePage>
     // Get Obsidian tools
     final obsidianTools = await obsidian.listTools();
     dumpTools('mcp-obsidian', obsidianTools);
-
     // Add Obsidian tools to available tools
     for (final tool in obsidianTools) {
       availableTools.add(McpToolItem(tool: tool, source: 'mcp-obsidian'));
     }
+  }
 
+  Future initTools() async {
+    print('\nInitializing MCP Tools');
+
+    // Clear existing tools
+    setState(() {
+      availableTools.clear();
+      mcpClients.clear();
+    });
+
+    /// TODO: [STEP01] 기본 툴 초기화
+    await initDefaultTools();
     // Return active tools for agent initialization
     return getActiveTools();
   }
 
+  Future initAgent(List<Tool> tools) async {
+    /// TODO: [STEP01] Agents 초기화
+    final provider = Providers.google;
+    final agent = Agent.forProvider(
+      provider,
+      chatModelName: modelName,
+      tools: tools,
+    );
+    return agent;
+  }
+
   // Get list of active tools
   List<Tool> getActiveTools() {
+    /// TODO: [STEP01] 사용 가능한 툴 목록 확인
     return availableTools
         .where((toolItem) => toolItem.isActive)
         .map((toolItem) => toolItem.tool)
         .toList();
-  }
-
-  // Update agent with current active tools
-  Future<void> updateAgent() async {
-    final activeTools = getActiveTools();
-    agent = await initAgent(activeTools);
-    setState(() {}); // Refresh UI after agent is updated
-  }
-
-  // Toggle tool active state
-  void toggleTool(McpToolItem tool, bool isActive) {
-    setState(() {
-      tool.isActive = isActive;
-    });
-    updateAgent();
   }
 
   // Add a new MCP tool source
@@ -170,6 +194,7 @@ class _MyHomePageState extends State<MyHomePage>
           }
 
           if (url != null && url.isNotEmpty) {
+            /// TODO: [STEP02] MCP Remote 추가
             newClient = McpClient.remote(
               sourceName,
               url: Uri.parse(url),
@@ -195,6 +220,7 @@ class _MyHomePageState extends State<MyHomePage>
           });
 
           if (command != null && command.isNotEmpty) {
+            /// TODO: [STEP02] MCP local 추가
             newClient = McpClient.local(
               sourceName,
               command: command,
@@ -204,6 +230,7 @@ class _MyHomePageState extends State<MyHomePage>
           }
         }
 
+        /// TODO: [STEP02] MCP mcpClients 추가
         if (newClient != null) {
           // Get tools from the new client
           final newTools = await newClient.listTools();
@@ -211,13 +238,13 @@ class _MyHomePageState extends State<MyHomePage>
           setState(() {
             // Add client to the map
             mcpClients[sourceName] = newClient!;
-
             // Add tools to the available tools list
             for (final tool in newTools) {
               availableTools.add(McpToolItem(tool: tool, source: sourceName));
             }
           });
 
+          /// TODO: [STEP02] agent 업데이트
           // Update agent with new tools
           await updateAgent();
         }
@@ -230,28 +257,33 @@ class _MyHomePageState extends State<MyHomePage>
     }
   }
 
+  // Update agent with current active tools
+  /// TODO: [STEP02] updateAgent
+  Future<void> updateAgent() async {
+    final activeTools = getActiveTools();
+    agent = await initAgent(activeTools);
+    setState(() {}); // Refresh UI after agent is updated
+  }
+
+  // Toggle tool active state
+  void toggleTool(McpToolItem tool, bool isActive) {
+    setState(() {
+      tool.isActive = isActive;
+    });
+    updateAgent();
+  }
+
   // Remove a tool source
   void removeToolSource(String sourceName) {
     setState(() {
       // Remove tools from this source
       availableTools.removeWhere((tool) => tool.source == sourceName);
-
       // Remove client
       mcpClients.remove(sourceName);
     });
 
     // Update agent with remaining tools
     updateAgent();
-  }
-
-  Future initAgent(List<Tool> tools) async {
-    final provider = Providers.google;
-    final agent = Agent.forProvider(
-      provider,
-      chatModelName: modelName,
-      tools: tools,
-    );
-    return agent;
   }
 
   Future sendMessage(String query) async {
@@ -272,7 +304,7 @@ class _MyHomePageState extends State<MyHomePage>
       history: history.sublist(0, history.length - 1),
     );
 
-    print('[result?.output] ${result?.output}');
+    print('[result.output] ${result?.output}');
 
     // Update token usage if available
     if (result?.usage != null) {
@@ -316,29 +348,6 @@ class _MyHomePageState extends State<MyHomePage>
     _scrollToBottom();
   }
 
-  @override
-  void initState() {
-    super.initState();
-
-    // Initialize tab controller for right panel
-    _tabController = TabController(length: 2, vsync: this);
-
-    // Initialize agent and tools
-    initSetup().then((_) async {
-      final tools = await initTools();
-      agent = await initAgent(tools);
-      setState(() {}); // Refresh UI after tools are loaded
-    });
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    _scrollController.dispose();
-    textEditingController.dispose();
-    super.dispose();
-  }
-
   void _incrementCounter() async {
     // await singleMcpServer();
   }
@@ -355,10 +364,8 @@ class _MyHomePageState extends State<MyHomePage>
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-
         title: Text(widget.title),
       ),
-
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
@@ -380,7 +387,6 @@ class _MyHomePageState extends State<MyHomePage>
                               history.clear();
                               history.add(systemMessage);
                             }
-
                             // 토큰 사용량도 초기화
                             currentPromptTokens = 0;
                             currentResponseTokens = 0;
