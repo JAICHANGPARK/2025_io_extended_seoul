@@ -5,71 +5,14 @@ import 'package:dartantic_interface/dartantic_interface.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mcp_dartantic/prompt.dart';
 
+import '../main.dart';
 import '../model/mcp_tool_item.dart';
 import '../ui/chat_bubble.dart';
 import '../ui/chat_loading_indicator.dart';
 import '../ui/dialog/add_tool_dialog.dart';
 import '../ui/token_usage_widget.dart';
 import '../ui/tool_management_widget.dart';
-
-final String geminiApiKey = "";
-final String huggingfaceKey = "";
-final String obsidianKey =
-    "";
-final String modelName = "gemini-2.5-flash";
-
-Future<void> singleMcpServer() async {
-  print('\nSingle MCP Server');
-  final huggingFace = McpClient.remote(
-    'huggingface',
-    url: Uri.parse('https://huggingface.co/mcp'),
-    headers: {"Authorization": "Bearer ${huggingfaceKey}"},
-  );
-
-  final hgTools = await huggingFace.listTools();
-  dumpTools('huggingface', hgTools);
-
-  final obsidian = McpClient.local(
-    'mcp-obsidian',
-    command: "uvx",
-    args: ["mcp-obsidian"],
-    environment: {
-      "OBSIDIAN_API_KEY": obsidianKey,
-      "OBSIDIAN_HOST": "https://127.0.0.1",
-      "OBSIDIAN_PORT": "27124",
-    },
-  );
-  final obsidianTools = await obsidian.listTools();
-  dumpTools('mcp-obsidian', obsidianTools);
-
-  final provider = Providers.google;
-  final agent = Agent.forProvider(
-    provider,
-    chatModelName: modelName,
-    tools: [...obsidianTools, ...hgTools],
-  );
-
-  const query = '한국의 대표 llm 모델에 대해 정리해주고 이를 옵시디언에 문서로 저장해줘.';
-  final result = await agent.send(
-    query,
-    // history: [ChatMessage.system('Be concise, reply with one sentence.')],
-  );
-
-  print(result.output);
-}
-
-void dumpTools(String name, Iterable<Tool> tools) {
-  print('\n# $name');
-  for (final tool in tools) {
-    final json = const JsonEncoder.withIndent(
-      '  ',
-    ).convert(jsonDecode(tool.inputSchema.toJson()));
-    print('\n## Tool');
-    print('- name: ${tool.name}');
-    print('- description: ${tool.description}');
-    print('- inputSchema: $json');
-  }
-}
+import '../utils.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
