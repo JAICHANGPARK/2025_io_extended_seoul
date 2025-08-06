@@ -2,7 +2,6 @@
 import 'package:dartantic_ai/dartantic_ai.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mcp_dartantic/model/mcp_tool_item.dart';
-import 'package:mcp_dart/mcp_dart.dart' as tool;
 
 class ToolManagementWidget extends StatelessWidget {
   final List<McpToolItem> tools;
