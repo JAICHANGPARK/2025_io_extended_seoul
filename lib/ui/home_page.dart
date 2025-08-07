@@ -197,7 +197,11 @@ class _MyHomePageState extends State<MyHomePage>
 
           if (url != null && url.isNotEmpty) {
             /// TODO: [STEP02] MCP Remote 추가
-
+            newClient = McpClient.remote(
+              sourceName,
+              url: Uri.parse(url),
+              headers: headers,
+            );
           }
         } else if (sourceType == 'local') {
           final command = sourceConfig['command'];
@@ -219,14 +223,28 @@ class _MyHomePageState extends State<MyHomePage>
 
           if (command != null && command.isNotEmpty) {
             /// TODO: [STEP02] MCP local 추가
-
+            newClient = McpClient.local(
+              sourceName,
+              command: command,
+              args: args,
+              environment: environment,
+            );
           }
         }
 
         /// TODO: [STEP02] MCP mcpClients 추가
         if (newClient != null) {
           // Get tools from the new client
+          final newTools = await newClient.listTools();
 
+          setState(() {
+            // Add client to the map
+            mcpClients[sourceName] = newClient!;
+            // Add tools to the available tools list
+            for (final tool in newTools) {
+              availableTools.add(McpToolItem(tool: tool, source: sourceName));
+            }
+          });
 
           /// TODO: [STEP02] agent 업데이트
           // Update agent with new tools
@@ -244,7 +262,8 @@ class _MyHomePageState extends State<MyHomePage>
   // Update agent with current active tools
   /// TODO: [STEP02] updateAgent
   Future<void> updateAgent() async {
-
+    final activeTools = getActiveTools();
+    agent = await initAgent(activeTools);
     setState(() {}); // Refresh UI after agent is updated
   }
 
@@ -441,7 +460,45 @@ class _MyHomePageState extends State<MyHomePage>
             ),
             /// TODO: [STEP02] 탭바 위젯 추가
             // Right panel with tabs
-
+            Expanded(
+              child: Column(
+                children: [
+                  // Tab bar
+                  TabBar(
+                    controller: _tabController,
+                    tabs: const [
+                      Tab(icon: Icon(Icons.analytics), text: 'Token Usage'),
+                      Tab(icon: Icon(Icons.build), text: 'MCP Tools'),
+                    ],
+                  ),
+                  // Tab views
+                  Expanded(
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        // Token usage tab
+                        TokenUsageWidget(
+                          promptTokens: currentPromptTokens,
+                          responseTokens: currentResponseTokens,
+                          totalTokens: currentTotalTokens,
+                          cumulativePromptTokens: cumulativePromptTokens,
+                          cumulativeResponseTokens: cumulativeResponseTokens,
+                          cumulativeTotalTokens: cumulativeTotalTokens,
+                        ),
+                        // Tool management tab
+                        ToolManagementWidget(
+                          tools: availableTools,
+                          clients: mcpClients,
+                          onToolToggle: toggleTool,
+                          onAddToolSource: () => addToolSource(context),
+                          onRemoveToolSource: removeToolSource,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
