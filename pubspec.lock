@@ -486,13 +486,13 @@ packages:
     source: hosted
     version: "0.11.1"
   mcp_dart:
-    dependency: "direct main"
+    dependency: "direct overridden"
     description:
       name: mcp_dart
-      sha256: "4bc05574bc8bda0ae779e177ab5639f580b37059b5cb1248288b7a79979dd5e6"
+      sha256: "2577d0ce88feb588e70e7a3492f0c2e7136d3f6605261d68ac58f4a3f6e4bc35"
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.3"
+    version: "0.6.0"
   meta:
     dependency: transitive
     description:
