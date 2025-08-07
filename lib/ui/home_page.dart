@@ -300,6 +300,7 @@ class _MyHomePageState extends State<MyHomePage>
     _scrollToBottom();
 
     // Send message to agent
+    /// TODO: [STEP01] SEND MESSAGE
     var result = await agent?.send(
       query,
       history: history.sublist(0, history.length - 1),
@@ -401,6 +402,7 @@ class _MyHomePageState extends State<MyHomePage>
                       ),
                     ],
                   ),
+                  /// TODO: [STEP01] 대화 내용 UI 추가
                   Expanded(
                     child: ListView.builder(
                       controller: _scrollController,
@@ -455,6 +457,7 @@ class _MyHomePageState extends State<MyHomePage>
                 ],
               ),
             ),
+            /// TODO: [STEP02] 탭바 위젯 추가
             // Right panel with tabs
             Expanded(
               child: Column(
