@@ -1,4 +1,3 @@
-
 // Dialog for adding a new tool source
 import 'package:flutter/material.dart';
 
