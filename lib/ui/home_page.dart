@@ -93,6 +93,17 @@ class _MyHomePageState extends State<MyHomePage>
     Agent.environment['GEMINI_API_KEY'] = geminiApiKey;
   }
 
+  Future initAgent(List<Tool> tools) async {
+    /// TODO: [STEP01] Agents 초기화
+    final provider = Providers.google;
+    final agent = Agent.forProvider(
+      provider,
+      chatModelName: modelName,
+      tools: tools,
+    );
+    return agent;
+  }
+
   Future initDefaultTools() async {
     /// TODO: [STEP01] 기본 툴 초기화
     // Initialize HuggingFace client
@@ -148,17 +159,6 @@ class _MyHomePageState extends State<MyHomePage>
     await initDefaultTools();
     // Return active tools for agent initialization
     return getActiveTools();
-  }
-
-  Future initAgent(List<Tool> tools) async {
-    /// TODO: [STEP01] Agents 초기화
-    final provider = Providers.google;
-    final agent = Agent.forProvider(
-      provider,
-      chatModelName: modelName,
-      tools: tools,
-    );
-    return agent;
   }
 
   // Get list of active tools
