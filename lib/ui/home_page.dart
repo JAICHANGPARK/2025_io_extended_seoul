@@ -86,6 +86,12 @@ class _MyHomePageState extends State<MyHomePage>
     /// TODO: [STEP01] Agents
   }
 
+  Future initAgent(List<Tool> tools) async {
+    /// TODO: [STEP01] Agents 초기화
+
+    return agent;
+  }
+  
   Future initDefaultTools() async {
     /// TODO: [STEP01] 기본 툴 초기화
     // Initialize HuggingFace client
@@ -106,11 +112,6 @@ class _MyHomePageState extends State<MyHomePage>
     return getActiveTools();
   }
 
-  Future initAgent(List<Tool> tools) async {
-    /// TODO: [STEP01] Agents 초기화
-
-    return agent;
-  }
 
   // Get list of active tools
   List<Tool> getActiveTools() {
