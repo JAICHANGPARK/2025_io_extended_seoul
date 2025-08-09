@@ -21,7 +21,7 @@ class ChatBubble extends StatelessWidget {
     final messageStr = message.parts.first.toJson()['content'].toString();
     final contentParts = <String>[];
 
-    print('messageContent message: ${message.role.name}');
+    // print('messageContent message: ${message.role.name}');
 
     // 각 파트 타입별로 콘솔 출력
     for (final part in message.parts) {

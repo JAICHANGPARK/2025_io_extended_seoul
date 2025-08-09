@@ -94,7 +94,7 @@ class ToolManagementWidget extends StatelessWidget {
             ),
           ],
         ),
-        initiallyExpanded: true,
+        // initiallyExpanded: true,
         children: [
           ListView.builder(
             shrinkWrap: true,

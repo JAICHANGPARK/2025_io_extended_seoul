@@ -33,20 +33,21 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.8
+
+  logging: ^1.3.0
+
   dartantic_ai: ^1.0.6
   dartantic_interface: ^1.0.2
 
-  chrono_dart: ^2.0.2
   cross_file: ^0.3.4+2
+  chrono_dart: ^2.0.2
   dotprompt_dart: ^0.3.0
   json_annotation: ^4.9.0
   json_schema: ^5.2.1
-  logging: ^1.3.0
   soti_schema: ^1.0.0
 
   flutter_markdown: ^0.7.7+1
   url_launcher: ^6.3.2
-
 
 dependency_overrides:
   mcp_dart: ^0.6.0
@@ -54,7 +55,6 @@ dependency_overrides:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
 
   flutter_lints: ^6.0.0
   build_runner: ^2.5.4
