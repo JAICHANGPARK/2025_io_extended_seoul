@@ -71,11 +71,7 @@ class _MyHomePageState extends State<MyHomePage>
 
     // Initialize agent and tools
     // TODO: [STEP01] initState setup()
-    initSetup().then((_) async {
-      final tools = await initTools();
-      agent = await initAgent(tools);
-      setState(() {}); // Refresh UI after tools are loaded
-    });
+
   }
 
   @override
@@ -89,60 +85,16 @@ class _MyHomePageState extends State<MyHomePage>
   Future initSetup() async {
     // Enable default logging
     /// TODO: [STEP01] Agents
-    Agent.loggingOptions = const LoggingOptions();
-    Agent.environment['GEMINI_API_KEY'] = geminiApiKey;
   }
 
   Future initAgent(List<Tool> tools) async {
     /// TODO: [STEP01] Agents 초기화
-    final provider = Providers.google;
-    final agent = Agent.forProvider(
-      provider,
-      chatModelName: modelName,
-      tools: tools,
-    );
     return agent;
   }
-
+  
   Future initDefaultTools() async {
     /// TODO: [STEP01] 기본 툴 초기화
     // Initialize HuggingFace client
-    final huggingFace = McpClient.remote(
-      'huggingface',
-      url: Uri.parse('https://huggingface.co/mcp'),
-      headers: {"Authorization": "Bearer ${huggingfaceKey}"},
-    );
-    mcpClients['huggingface'] = huggingFace;
-
-    // Get HuggingFace tools
-    final hgTools = await huggingFace.listTools();
-    dumpTools('huggingface', hgTools);
-
-    // Add HuggingFace tools to available tools
-    for (final tool in hgTools) {
-      availableTools.add(McpToolItem(tool: tool, source: 'huggingface'));
-    }
-
-    // Initialize Obsidian client
-    final obsidian = McpClient.local(
-      'mcp-obsidian',
-      command: "uvx",
-      args: ["mcp-obsidian"],
-      environment: {
-        "OBSIDIAN_API_KEY": obsidianKey,
-        "OBSIDIAN_HOST": "https://127.0.0.1",
-        "OBSIDIAN_PORT": "27124",
-      },
-    );
-    mcpClients['mcp-obsidian'] = obsidian;
-
-    // Get Obsidian tools
-    final obsidianTools = await obsidian.listTools();
-    dumpTools('mcp-obsidian', obsidianTools);
-    // Add Obsidian tools to available tools
-    for (final tool in obsidianTools) {
-      availableTools.add(McpToolItem(tool: tool, source: 'mcp-obsidian'));
-    }
   }
 
   Future initTools() async {
@@ -164,10 +116,7 @@ class _MyHomePageState extends State<MyHomePage>
   // Get list of active tools
   List<Tool> getActiveTools() {
     /// TODO: [STEP01] 사용 가능한 툴 목록 확인
-    return availableTools
-        .where((toolItem) => toolItem.isActive)
-        .map((toolItem) => toolItem.tool)
-        .toList();
+    return [];
   }
 
   // Add a new MCP tool source
@@ -198,11 +147,6 @@ class _MyHomePageState extends State<MyHomePage>
 
           if (url != null && url.isNotEmpty) {
             /// TODO: [STEP02] MCP Remote 추가
-            newClient = McpClient.remote(
-              sourceName,
-              url: Uri.parse(url),
-              headers: headers,
-            );
           }
         } else if (sourceType == 'local') {
           final command = sourceConfig['command'];
@@ -224,32 +168,15 @@ class _MyHomePageState extends State<MyHomePage>
 
           if (command != null && command.isNotEmpty) {
             /// TODO: [STEP02] MCP local 추가
-            newClient = McpClient.local(
-              sourceName,
-              command: command,
-              args: args,
-              environment: environment,
-            );
           }
         }
 
         /// TODO: [STEP02] MCP mcpClients 추가
         if (newClient != null) {
           // Get tools from the new client
-          final newTools = await newClient.listTools();
-
-          setState(() {
-            // Add client to the map
-            mcpClients[sourceName] = newClient!;
-            // Add tools to the available tools list
-            for (final tool in newTools) {
-              availableTools.add(McpToolItem(tool: tool, source: sourceName));
-            }
-          });
 
           /// TODO: [STEP02] agent 업데이트
           // Update agent with new tools
-          await updateAgent();
         }
       } catch (e) {
         // Show error message
@@ -263,8 +190,6 @@ class _MyHomePageState extends State<MyHomePage>
   // Update agent with current active tools
   /// TODO: [STEP02] updateAgent
   Future<void> updateAgent() async {
-    final activeTools = getActiveTools();
-    agent = await initAgent(activeTools);
     setState(() {}); // Refresh UI after agent is updated
   }
 
@@ -303,10 +228,6 @@ class _MyHomePageState extends State<MyHomePage>
 
     // Send message to agent
     /// TODO: [STEP01] SEND MESSAGE
-    var result = await agent?.send(
-      query,
-      history: history.sublist(0, history.length - 1),
-    );
 
     print('[result.output] ${result?.output}');
 
@@ -406,27 +327,6 @@ class _MyHomePageState extends State<MyHomePage>
                   ),
 
                   /// TODO: [STEP01] 대화 내용 UI 추가
-                  Expanded(
-                    child: ListView.builder(
-                      controller: _scrollController,
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      itemBuilder: (context, index) {
-                        // Show regular message from the filtered list
-                        if (index < displayHistory.length) {
-                          // displayHistory를 사용하도록 수정
-                          return ChatBubble(message: displayHistory[index]);
-                        }
-                        // Show loading indicator
-                        else {
-                          return const ChatLoadingIndicator();
-                        }
-                      },
-                      // itemCount를 displayHistory.length 기준으로 수정
-                      itemCount: isLoading
-                          ? displayHistory.length + 1
-                          : displayHistory.length,
-                    ),
-                  ),
                   Row(
                     spacing: 12,
                     children: [
@@ -463,45 +363,12 @@ class _MyHomePageState extends State<MyHomePage>
 
             /// TODO: [STEP02] 탭바 위젯 추가
             // Right panel with tabs
-            Expanded(
-              child: Column(
-                children: [
-                  // Tab bar
-                  TabBar(
-                    controller: _tabController,
-                    tabs: const [
-                      Tab(icon: Icon(Icons.analytics), text: 'Token Usage'),
-                      Tab(icon: Icon(Icons.build), text: 'MCP Tools'),
-                    ],
-                  ),
-                  // Tab views
-                  Expanded(
-                    child: TabBarView(
-                      controller: _tabController,
-                      children: [
-                        // Token usage tab
-                        TokenUsageWidget(
-                          promptTokens: currentPromptTokens,
-                          responseTokens: currentResponseTokens,
-                          totalTokens: currentTotalTokens,
-                          cumulativePromptTokens: cumulativePromptTokens,
-                          cumulativeResponseTokens: cumulativeResponseTokens,
-                          cumulativeTotalTokens: cumulativeTotalTokens,
-                        ),
-                        // Tool management tab
-                        ToolManagementWidget(
-                          tools: availableTools,
-                          clients: mcpClients,
-                          onToolToggle: toggleTool,
-                          onAddToolSource: () => addToolSource(context),
-                          onRemoveToolSource: removeToolSource,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // Expanded(
+            //   child: TabBarView(
+            //     controller: _tabController,
+            //     children: [Placeholder(), Placeholder()],
+            //   ),
+            // ),
           ],
         ),
       ),
