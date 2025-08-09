@@ -197,7 +197,6 @@ class _MyHomePageState extends State<MyHomePage>
 
           if (url != null && url.isNotEmpty) {
             /// TODO: [STEP02] MCP Remote 추가
-
           }
         } else if (sourceType == 'local') {
           final command = sourceConfig['command'];
@@ -219,14 +218,12 @@ class _MyHomePageState extends State<MyHomePage>
 
           if (command != null && command.isNotEmpty) {
             /// TODO: [STEP02] MCP local 추가
-
           }
         }
 
         /// TODO: [STEP02] MCP mcpClients 추가
         if (newClient != null) {
           // Get tools from the new client
-
 
           /// TODO: [STEP02] agent 업데이트
           // Update agent with new tools
@@ -244,7 +241,6 @@ class _MyHomePageState extends State<MyHomePage>
   // Update agent with current active tools
   /// TODO: [STEP02] updateAgent
   Future<void> updateAgent() async {
-
     setState(() {}); // Refresh UI after agent is updated
   }
 
@@ -384,6 +380,7 @@ class _MyHomePageState extends State<MyHomePage>
                       ),
                     ],
                   ),
+
                   /// TODO: [STEP01] 대화 내용 UI 추가
                   Expanded(
                     child: ListView.builder(
@@ -439,9 +436,27 @@ class _MyHomePageState extends State<MyHomePage>
                 ],
               ),
             ),
+
             /// TODO: [STEP02] 탭바 위젯 추가
             // Right panel with tabs
-
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  // Token usage tab
+                  TokenUsageWidget(
+                    promptTokens: currentPromptTokens,
+                    responseTokens: currentResponseTokens,
+                    totalTokens: currentTotalTokens,
+                    cumulativePromptTokens: cumulativePromptTokens,
+                    cumulativeResponseTokens: cumulativeResponseTokens,
+                    cumulativeTotalTokens: cumulativeTotalTokens,
+                  ),
+                  // Tool management tab
+                  Placeholder(),
+                ],
+              ),
+            ),
           ],
         ),
       ),
