@@ -94,44 +94,8 @@ class _MyHomePageState extends State<MyHomePage>
   }
 
   Future initDefaultTools() async {
-    /// TODO: [STEP01] 기본 툴 초기화
-    // Initialize HuggingFace client
-    final huggingFace = McpClient.remote(
-      'huggingface',
-      url: Uri.parse('https://huggingface.co/mcp'),
-      headers: {"Authorization": "Bearer ${huggingfaceKey}"},
-    );
-    mcpClients['huggingface'] = huggingFace;
+    /// TODO: [STEP02] 기본 툴 초기화
 
-    // Get HuggingFace tools
-    final hgTools = await huggingFace.listTools();
-    dumpTools('huggingface', hgTools);
-
-    // Add HuggingFace tools to available tools
-    for (final tool in hgTools) {
-      availableTools.add(McpToolItem(tool: tool, source: 'huggingface'));
-    }
-
-    // Initialize Obsidian client
-    final obsidian = McpClient.local(
-      'mcp-obsidian',
-      command: "uvx",
-      args: ["mcp-obsidian"],
-      environment: {
-        "OBSIDIAN_API_KEY": obsidianKey,
-        "OBSIDIAN_HOST": "https://127.0.0.1",
-        "OBSIDIAN_PORT": "27124",
-      },
-    );
-    mcpClients['mcp-obsidian'] = obsidian;
-
-    // Get Obsidian tools
-    final obsidianTools = await obsidian.listTools();
-    dumpTools('mcp-obsidian', obsidianTools);
-    // Add Obsidian tools to available tools
-    for (final tool in obsidianTools) {
-      availableTools.add(McpToolItem(tool: tool, source: 'mcp-obsidian'));
-    }
   }
 
   Future initTools() async {
