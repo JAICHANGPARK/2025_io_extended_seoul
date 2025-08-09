@@ -70,6 +70,7 @@ class _MyHomePageState extends State<MyHomePage>
     _tabController = TabController(length: 2, vsync: this);
 
     // Initialize agent and tools
+    // TODO: [STEP01] initState setup()
     initSetup().then((_) async {
       final tools = await initTools();
       agent = await initAgent(tools);
@@ -143,6 +144,7 @@ class _MyHomePageState extends State<MyHomePage>
     });
 
     /// TODO: [STEP01] 기본 툴 초기화
+    /// 불필요하다면 처리하지 않아도 무관
     await initDefaultTools();
     // Return active tools for agent initialization
     return getActiveTools();
@@ -402,6 +404,7 @@ class _MyHomePageState extends State<MyHomePage>
                       ),
                     ],
                   ),
+
                   /// TODO: [STEP01] 대화 내용 UI 추가
                   Expanded(
                     child: ListView.builder(
@@ -457,6 +460,7 @@ class _MyHomePageState extends State<MyHomePage>
                 ],
               ),
             ),
+
             /// TODO: [STEP02] 탭바 위젯 추가
             // Right panel with tabs
             Expanded(
