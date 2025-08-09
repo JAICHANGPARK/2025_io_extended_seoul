@@ -70,7 +70,8 @@ class _MyHomePageState extends State<MyHomePage>
     _tabController = TabController(length: 2, vsync: this);
 
     // Initialize agent and tools
-    /// TODO: [STEP01] init
+    // TODO: [STEP01] initState setup()
+
   }
 
   @override
@@ -88,7 +89,6 @@ class _MyHomePageState extends State<MyHomePage>
 
   Future initAgent(List<Tool> tools) async {
     /// TODO: [STEP01] Agents 초기화
-
     return agent;
   }
   
@@ -107,11 +107,11 @@ class _MyHomePageState extends State<MyHomePage>
     });
 
     /// TODO: [STEP01] 기본 툴 초기화
-
+    /// 불필요하다면 처리하지 않아도 무관
+    await initDefaultTools();
     // Return active tools for agent initialization
     return getActiveTools();
   }
-
 
   // Get list of active tools
   List<Tool> getActiveTools() {
