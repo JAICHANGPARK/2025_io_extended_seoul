@@ -362,12 +362,12 @@ class _MyHomePageState extends State<MyHomePage>
 
             /// TODO: [STEP02] 탭바 위젯 추가
             // Right panel with tabs
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [Placeholder(), Placeholder()],
-              ),
-            ),
+            // Expanded(
+            //   child: TabBarView(
+            //     controller: _tabController,
+            //     children: [Placeholder(), Placeholder()],
+            //   ),
+            // ),
           ],
         ),
       ),
